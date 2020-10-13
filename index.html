@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Grid picker demo page</title>
+        <link rel="stylesheet" href="./src/jquery-grid-picker.css" />
+    </head>
+    <body>
+        <h3>Defalt</h3>
+        <select class="select default">
+            <option value="ford">Ford</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+            <option value="bmw">Bmw</option>
+            <option value="volvo">Volvo</option>
+        </select>
+        <h3>Allow unselect</h3>
+        <select class="select default unselect">
+            <option value="ford">Ford</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+            <option value="bmw">Bmw</option>
+            <option value="volvo">Volvo</option>
+        </select>
+        <h3>Multiple</h3>
+        <select class="select default multiple" multiple>
+            <option value="ford">Ford</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+            <option value="bmw">Bmw</option>
+            <option value="volvo">Volvo</option>
+        </select>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="./src/jquery-grid-picker.js"></script>
+        <script>
+            ;(function() {
+                $(".select")
+                    .gridPicker()
+                    .each(function() {
+                        if ($(this).hasClass("unselect"))
+                            $(this).gridPicker("setOption", "canUnselect", true)
+                    });
+            })();
+        </script>
+    </body>
+</html>
