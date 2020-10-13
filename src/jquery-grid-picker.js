@@ -447,30 +447,35 @@
          * @return {Void}
          */
         _handleMutation: function(e) {
-            // Store elements for sync (we can't use single
-            // object here, because we must execute sync for
-            // removed elements before added ones).
-            var $syncEdit = $(null),
-                $syncRemove = $(null),
-                $syncAdd = $(null);
+            // Element list that needs sync. It would be easier
+            // to use jQuery object here, but jQuery's list of
+            // elements is sorted. We need to apply sync method
+            // on elements as provided in MutationRecord list.
+            var elements = [],
+                addToElements = function(element) {
+                    $(element)
+                        .closest("option")
+                        .each(function(index, value) {
+                            if (elements.indexOf(value) === -1)
+                                elements.push(value);
+                        });
+                };
 
-            // Iterate mutations.
+            // Iterate mutation record list and find elements
+            // that need sync.
             e.forEach(function(record) {
                 if (record.type === "childList") {
-                    $syncRemove = $syncRemove.add($(record.removedNodes).closest("option"));
-                    $syncAdd = $syncAdd.add($(record.addedNodes).closest("option"));
+                    addToElements(record.removedNodes);
+                    addToElements(record.addedNodes);
                 }
                 else if ((record.type === "attributes" && record.target !== this.element) || (record.type === "characterData"))
-                    $syncEdit = $syncEdit.add($(record.target).closest("option"));
+                    addToElements(record.target);
             }.bind(this));
 
             // Sync mutated elements.
-            var execSync = function(index, element) {
+            elements.forEach(function(element) {
                 this._syncItem(element);
-            }.bind(this);
-            $syncEdit.each(execSync);
-            $syncRemove.each(execSync);
-            $syncAdd.each(execSync);
+            }.bind(this));
         },
 
         /**
