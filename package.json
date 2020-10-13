@@ -1,0 +1,21 @@
+{
+  "name": "jquery-grid-picker",
+  "title": "jQuery grid picker",
+  "description": "Display `HTMLSelectElement as grid with clickable (select/unselect) items",
+  "version": "0.1.0",
+  "main": "src/jquery-grid-picker.js",
+  "homepage": "https://github.com/fffilo/jquery-grid-picker",
+  "authors": [
+    "Franjo Filo <fffilo666@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fffilo/jquery-grid-picker.git"
+  },
+  "keywords": [
+    "javascript",
+    "jquery",
+    "grid",
+    "picker"
+  ]
+}
