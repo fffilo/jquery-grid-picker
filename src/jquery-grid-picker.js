@@ -340,6 +340,7 @@
                 return;
 
             var index = $element.index(),
+                selected = $element.prop("selected"),
                 hidden = $element.css("display") === "none",
                 disabled = $element.is(":disabled");
 
@@ -347,6 +348,7 @@
             item = this._renderItemWrapper(element);
             $(item)
                 .addClass("jquery-grid-picker-item")
+                .addClass("jquery-grid-picker-item-" + (selected ? "selected" : "temp"))
                 .addClass("jquery-grid-picker-item-" + (hidden ? "hidden" : "temp"))
                 .addClass("jquery-grid-picker-item-" + (disabled ? "disabled" : "temp"))
                 .removeClass("jquery-grid-picker-item-temp")
@@ -498,9 +500,9 @@
                     .join(",");
 
             this._$ui.items
-                .removeClass("jquery-grid-picker-active")
+                .removeClass("jquery-grid-picker-item-selected")
                 .filter(filter)
-                    .addClass("jquery-grid-picker-active");
+                    .addClass("jquery-grid-picker-item-selected");
         },
 
         /**
