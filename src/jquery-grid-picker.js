@@ -223,9 +223,7 @@
             this._$ui.element
                 .off(".jquerygridpicker")
                 .removeClass("jquery-grid-picker")
-                .removeData("jquery-grid-picker")
-                    .find("option")
-                    .removeData("jquery-grid-picker-sync");
+                .removeData("jquery-grid-picker");
             this._$ui.widget
                 .remove();
 
@@ -321,13 +319,14 @@
         _syncItem: function(element) {
             // Clear old element widget item (if exists).
             var $element = $(element),
-                item = $element.data("jquery-grid-picker-sync");
+                attached = !!$element.closest(this.element).length,
+                value = $element.val(),
+                item = this._$ui.items.filter('[data-jquery-grid-picker-value="' + this._selectorEscape(value) + '"]').get(0);
             this._$ui.items = this._$ui.items.not(item);
             $(item).remove();
-            $element.removeData("jquery-grid-picker-sync");
 
-            // Element is detached, skip everything.
-            if (!$element.closest(this.element).length)
+            // Element is detached, nothing else to do here.
+            if (!attached)
                 return;
 
             // Render item content from render option.
@@ -341,7 +340,6 @@
                 return;
 
             var index = $element.index(),
-                value = $element.val(),
                 hidden = $element.css("display") === "none",
                 disabled = $element.is(":disabled");
 
@@ -353,13 +351,10 @@
                 .addClass("jquery-grid-picker-item-" + (disabled ? "disabled" : "temp"))
                 .removeClass("jquery-grid-picker-item-temp")
                 .attr("data-jquery-grid-picker-value", value)
-                .removeAttr("data-jquery-grid-picker-item-temp")
-                .data("jquery-grid-picker-sync", element);
+                .removeAttr("data-jquery-grid-picker-item-temp");
             $(content)
                 .addClass("jquery-grid-picker-item-content")
                 .appendTo(item);
-            $element
-                .data("jquery-grid-picker-sync", item);
 
             // ...and append it to widget.
             if (!index)
@@ -452,24 +447,30 @@
          * @return {Void}
          */
         _handleMutation: function(e) {
-            // Store elements for sync.
-            var $sync = $(null);
+            // Store elements for sync (we can't use single
+            // object here, because we must execute sync for
+            // removed elements before added ones).
+            var $syncEdit = $(null),
+                $syncRemove = $(null),
+                $syncAdd = $(null);
 
             // Iterate mutations.
             e.forEach(function(record) {
-                if ((record.type === "attributes" && record.target !== this.element) || (record.type === "characterData"))
-                    $sync = $sync
-                        .add($(record.target).closest("option"));
-                else if (record.type === "childList")
-                    $sync = $sync
-                        .add($(record.addedNodes).closest("option"))
-                        .add($(record.removedNodes).closest("option"));
+                if (record.type === "childList") {
+                    $syncRemove = $syncRemove.add($(record.removedNodes).closest("option"));
+                    $syncAdd = $syncAdd.add($(record.addedNodes).closest("option"));
+                }
+                else if ((record.type === "attributes" && record.target !== this.element) || (record.type === "characterData"))
+                    $syncEdit = $syncEdit.add($(record.target).closest("option"));
             }.bind(this));
 
             // Sync mutated elements.
-            $sync.each(function(index, element) {
+            var execSync = function(index, element) {
                 this._syncItem(element);
-            }.bind(this));
+            }.bind(this);
+            $syncEdit.each(execSync);
+            $syncRemove.each(execSync);
+            $syncAdd.each(execSync);
         },
 
         /**
